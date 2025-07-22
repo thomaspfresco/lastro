@@ -196,7 +196,7 @@ const Landing = () => {
           {/* Animated Scroll Arrow - absolute bottom */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="absolute bottom-16 left-1/2 -translate-x-1/2 h-10 w-10 text-white"
+            className="absolute bottom-14 left-1/2 -translate-x-1/2 h-10 w-10 text-white"
             style={{
               opacity: 0,
               animation: `
@@ -228,12 +228,12 @@ const Landing = () => {
           </h2>
           <p className="text-xs sm:text-base md:text-lg leading-normal font-dm_light">
             A plataforma em desenvolvimento permite uma exploração
-            interativa do acervo MPAGDP — simples como conversar com um
-            amigo. O resultado de anos de recolhe alimenta um motor de
+            interativa do acervo da MPAGDP — simples como conversar com um
+            amigo. O resultado de anos de recolha alimenta um motor de
             busca capaz de compreender linguagem natural, ajudando a
             encontrar não só o que procuramos, mas também o que ainda não
             sabemos que queremos ver. A ferramenta promete uma experiência
-            acessível e completa, eliminando a sensação de que algo ficou por
+            acessível e completa, minimizando a sensação de que algo ficou por
             descobrir.
           </p>
 
