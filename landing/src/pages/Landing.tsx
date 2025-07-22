@@ -227,12 +227,12 @@ const Landing = () => {
             Uma nova forma de explorar o património cultural português
           </h2>
           <p className="text-xs sm:text-base md:text-lg leading-normal font-dm_light">
-            A plataforma em desenvolvimento vai permitir uma exploração
+            A plataforma em desenvolvimento permite uma exploração
             interativa do acervo MPAGDP — simples como conversar com um
-            amigo. O resultado de anos de recolha vai alimentar um motor de
+            amigo. O resultado de anos de recolhe alimenta um motor de
             busca capaz de compreender linguagem natural, ajudando a
-            encontrar não só o que procurávamos, mas também o que não
-            sabíamos que queríamos ver. A ferramenta promete uma experiência
+            encontrar não só o que procuramos, mas também o que ainda não
+            sabemos que queremos ver. A ferramenta promete uma experiência
             acessível e completa, eliminando a sensação de que algo ficou por
             descobrir.
           </p>
