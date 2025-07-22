@@ -156,7 +156,7 @@ const Landing = () => {
           <iframe
             ref={iframeRef}
             title="vimeo-background"
-            src={`https://player.vimeo.com/video/${videoId}?autoplay=1&loop=1&muted=1&background=1`}
+            src={`https://player.vimeo.com/video/${videoId}?autoplay=1&loop=1&muted=1&background=1&quality=360p`}
             frameBorder="0"
             allow="autoplay; fullscreen"
             allowFullScreen
@@ -221,7 +221,7 @@ const Landing = () => {
       </div>
 
       {/* SECTION 2 — Footer Section */}
-      <div className="h-screen bg-black text-white px-8 py-10 flex flex-col justify-center max-w-[1920px] mx-auto">
+      <div className="min-h-screen bg-black text-white px-8 py-10 flex flex-col justify-center max-w-[1920px] mx-auto">
         <div className="text-left max-w-3xl mx-auto">
           <h2 className="text-base sm:text-lg md:text-3xl font-dela mb-2 sm:mb-4 md:mb-8">
             Uma nova forma de explorar o património cultural português
@@ -237,7 +237,7 @@ const Landing = () => {
             descobrir.
           </p>
 
-          <p className="pt-8 text-lg sm:text-xl md:text-2xl leading-normal font-dela">
+          <p className="pt-8 text-xs sm:text-base md:text-2xl leading-normal font-dela">
             Entretanto
           </p>
 
