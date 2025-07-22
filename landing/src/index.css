@@ -1,0 +1,37 @@
+
+@font-face {
+  font-family: dela;
+  src: url('./assets/fonts/Dela_Gothic_One/DelaGothicOne-Regular.ttf');
+}
+
+@font-face {
+  font-family: dm_light;
+  src: url('./assets/fonts/DM_Mono/DMMono-Light.ttf');
+}
+
+@font-face {
+  font-family: dm_bold;
+  src: url('./assets/fonts/DM_Mono/DMMono-Medium.ttf');
+}
+
+@import "tailwindcss";
+
+@theme {
+  --font-dela: dela, 'sans-serif';
+  --font-dm_light: dm_light, 'sans-serif';
+  --font-dm_bold: dm_bold, 'sans-serif';
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+body {
+    background-color: black;
+}
