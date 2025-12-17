@@ -6,8 +6,8 @@
 import subprocess
 import sys
 
-BASE_MODEL = 'deepseek-coder:6.7b'
-CUSTOM_MODEL_NAME = 'sql-agent-lastro-6.7b'
+BASE_MODEL = 'qwen2.5-coder:7b'
+CUSTOM_MODEL_NAME = 'sql-agent-lastro-7b'
 
 COLUMN_DESCRIPTIONS = """
   title - Título do vídeo/projeto
