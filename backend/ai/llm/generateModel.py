@@ -7,7 +7,7 @@ import subprocess
 import sys
 
 BASE_MODEL = 'qwen2.5-coder:7b'
-CUSTOM_MODEL_NAME = 'sql-agent-lastro-7b'
+CUSTOM_MODEL_NAME = 'sql-agent-lastro'
 
 COLUMN_DESCRIPTIONS = """
   title - Título do vídeo/projeto
