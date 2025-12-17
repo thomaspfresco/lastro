@@ -14,8 +14,11 @@ load_dotenv()
 # ==================================================
 
 def initCors(app):
+    allowed = os.getenv("ALLOWED_ORIGINS", "*")
+    origins = "*" if allowed == "*" else allowed.split(',')
+
     CORS(app, 
-     origins=os.getenv("ALLOWED_ORIGINS").split(','),
-     methods=["GET", "POST"],
-     allow_headers=["Content-Type", "Authorization"]
-)
+         resources={r"/*": {"origins": origins}},
+         methods=["GET", "POST"],
+         allow_headers=["Content-Type", "Authorization"]
+    )
