@@ -34,8 +34,13 @@ interface CookiePopupProps {
 interface ChatMessage {
   id?: number; // Unique sequential ID for each message
   prompt: string;
-  response: string;
   queries?: string[];
   descriptions?: string[];
   results?: Projects[];
+}
+
+interface QueryResponse {
+  queries: string[];
+  descriptions: string[];
+  results: Projects[];
 }

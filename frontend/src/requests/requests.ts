@@ -21,6 +21,6 @@ export async function sendQuery(data: {
   userIp: string;
   previousPrompts: string[];
   currentPrompt: string;
-}) {
-  return postRequest("/query", data);
+}): Promise<QueryResponse> {
+  return postRequest<QueryResponse>("/query", data);
 }
