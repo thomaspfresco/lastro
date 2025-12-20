@@ -211,7 +211,7 @@ body {
 /* page transitions */
 
 .page-transition {
-  min-height: 100vh;
+  min-height: 100dvh;
   width: 100%;
 
   animation-duration: 0.3s;
