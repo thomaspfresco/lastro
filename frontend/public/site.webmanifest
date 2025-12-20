@@ -1,7 +1,7 @@
 {
-  "name": "LASTRO - Explorador de Projetos Audiovisuais",
+  "name": "LASTRO - O Motor de Busca da MPAGDP",
   "short_name": "LASTRO",
-  "description": "Descubra e explore projetos audiovisuais únicos através de busca inteligente e recomendações personalizadas.",
+  "description": "Uma nova forma de explorar música, tradição oral, memória coletiva e património humano.",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
