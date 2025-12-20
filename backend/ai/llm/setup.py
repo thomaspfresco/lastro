@@ -34,8 +34,9 @@ def queryLLM(currentPrompt, previousPrompts):
                 'model': MODEL_NAME,
                 'prompt': formattedPrompt,
                 'stream': False,
+                'keep_alive': -1,
             },
-            timeout=120
+            timeout=60
         )
         
         if response.status_code == 200:

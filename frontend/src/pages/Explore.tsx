@@ -121,8 +121,11 @@ const Explore: React.FC = () => {
                 >
                   <div className="opacity-50">
                     <p className="text-note-3 uppercase pb-1">
-                      pesquisa #{(msg.id ?? idx) + 1} —{" "}
-                      {msg.results.flat().length} potenciais resultados
+                      pesquisa #{(msg.id ?? idx) + 1} —
+                      {" " + msg.results.flat().length + " "}
+                      {msg.results.flat().length === 1
+                        ? "potencial resultado"
+                        : "potenciais resultados"}
                     </p>
                     <h2 className="text-body-1">{msg.prompt}</h2>
                   </div>

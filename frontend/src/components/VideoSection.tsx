@@ -23,7 +23,7 @@ export default function VideoSection({ project }: VideoSectionProps) {
                 <p className="text-note-3 uppercase opacity-50 mb-0.5">
                   Categoria
                 </p>
-                <p className="text-body-1">{project.category}</p>
+                <p className="text-body-1 break-words">{project.category}</p>
               </div>
             )}
 
