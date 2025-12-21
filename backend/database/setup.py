@@ -74,7 +74,7 @@ def executeQueriesSQL(queries):
             results.append(rows)
         return results
     finally:
-        conn.close
+        conn.close()
 
 def recordInteraction(data,result):
     if data["cookieConsent"]:
