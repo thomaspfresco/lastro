@@ -1,9 +1,10 @@
 import axios from "axios";
 import type { AxiosInstance } from "axios";
 
+const isDev = import.meta.env.DEV;
+
 const api: AxiosInstance = axios.create({
-  baseURL: "http://127.0.0.1:5000",
-  //baseURL: "https://lastro.thomasfresco.pt/",
+  baseURL: isDev ? "http://127.0.0.1:5000" : "https://lastro.thomasfresco.pt",
   headers: {
     "Content-Type": "application/json",
   },
