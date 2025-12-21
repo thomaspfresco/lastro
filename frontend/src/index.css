@@ -177,14 +177,14 @@ body {
   font-family: "GeistMono", ui-monospace, monospace;
   font-weight: 400;
   font-size: 0.75rem; /* 12px */
-  line-height: 1.1;
+  line-height: 1;
 }
 
 @utility text-note-3 {
   font-family: "GeistMono", ui-monospace, monospace;
   font-weight: 400;
   font-size: 0.625rem; /* 10px */
-  line-height: 1.1;
+  line-height: 1;
 }
 
 /* scrollbar */
