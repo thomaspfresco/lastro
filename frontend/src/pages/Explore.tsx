@@ -88,7 +88,7 @@ const Explore: React.FC = () => {
   }, [messages.length]);
 
   return (
-    <div className="grid-setup !pt-[var(--menu-height)]">
+    <div className="grid-setup !pt-[var(--menu-height)] overflow-x-clip">
       <CookiePopup />
 
       <div
@@ -110,7 +110,6 @@ const Explore: React.FC = () => {
                 ref={(el) => {
                   searchResultRefs.current[idx] = el;
                 }}
-                className="overflow-x-clip"
               >
                 <div
                   ref={(el) => {

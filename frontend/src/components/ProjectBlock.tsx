@@ -1,6 +1,7 @@
 import ProjectCard from "./ProjectCard";
 import { MdArrowBackIosNew } from "react-icons/md";
-import { useState, useRef } from "react";
+import { useState, useRef, useLayoutEffect } from "react";
+import gsap from "gsap";
 
 interface ProjectBlockProps {
   title: string;
@@ -18,6 +19,7 @@ const ProjectBlock: React.FC<ProjectBlockProps> = ({
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [visibleCount, setVisibleCount] = useState(CARDS_PER_CHUNK);
   const blockRef = useRef<HTMLDivElement>(null);
+  const previousVisibleCount = useRef(CARDS_PER_CHUNK);
 
   const handleToggle = () => {
     setIsCollapsed((prev) => !prev);
@@ -33,10 +35,45 @@ const ProjectBlock: React.FC<ProjectBlockProps> = ({
 
   const hasMore = visibleCount < projects.length;
 
+  useLayoutEffect(() => {
+    if (visibleCount <= previousVisibleCount.current) return;
+    if (!blockRef.current) return;
+
+    const startRowIndex = Math.ceil(previousVisibleCount.current / 2);
+    const endRowIndex = Math.ceil(visibleCount / 2);
+    const newRows: HTMLElement[] = [];
+
+    for (let i = startRowIndex; i < endRowIndex; i++) {
+      const row = blockRef.current.querySelector(
+        `[data-row-index="${i}"]`
+      ) as HTMLElement;
+      if (row) newRows.push(row);
+    }
+
+    if (newRows.length > 0) {
+      const ctx = gsap.context(() => {
+        gsap.set(newRows, { opacity: 0, xPercent: 20 });
+        gsap.to(newRows, {
+          opacity: 1,
+          xPercent: 0,
+          duration: 1.0,
+          stagger: 0.1,
+          ease: "expo.out",
+        });
+      }, blockRef.current);
+
+      previousVisibleCount.current = visibleCount;
+
+      return () => ctx.revert();
+    }
+
+    previousVisibleCount.current = visibleCount;
+  }, [visibleCount]);
+
   return (
-    <div ref={blockRef} className="relative">
+    <div ref={blockRef} className="relative z-0">
       <div
-        className="sticky bg-color-bg z-0 pt-px pb-3"
+        className="sticky bg-color-bg z-10 pt-px pb-3"
         style={{ top: `calc(var(--menu-height) + ${topOffset}px)` }}
       >
         <div className="flex items-start gap-4 mb-3">
@@ -69,37 +106,41 @@ const ProjectBlock: React.FC<ProjectBlockProps> = ({
         `}
       >
         <div className="overflow-hidden">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-[-1]">
-            <div className="hidden md:block" />
+          <div className="flex flex-col gap-2 relative z-0">
+            {Array.from({ length: Math.ceil(visibleCount / 2) }).map(
+              (_, rowIndex) => {
+                const startIndex = rowIndex * 2;
+                const rowProjects = projects.slice(startIndex, startIndex + 2);
 
-            {[0, 1].map((colIndex) => {
-              const cardsInColumn = projects
-                .slice(0, visibleCount)
-                .filter((_, index) => index % 2 === colIndex);
-
-              return (
-                <div key={colIndex} className="flex flex-col gap-2">
-                  {cardsInColumn.map((project) => (
-                    <div key={project.id}>
-                      <ProjectCard project={project} />
-                    </div>
-                  ))}
-                </div>
-              );
-            })}
+                return (
+                  <div
+                    key={rowIndex}
+                    data-row-index={rowIndex}
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 md:gap-6 lg:gap-8"
+                  >
+                    <div className="hidden lg:block" />
+                    {rowProjects.map((project) => (
+                      <div key={project.id}>
+                        <ProjectCard project={project} />
+                      </div>
+                    ))}
+                  </div>
+                );
+              }
+            )}
 
             {hasMore && (
-              <>
-                <div className="hidden md:block" />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-0 md:gap-x-6 lg:gap-x-8 pt-4 lg:pt-6">
+                <div className="hidden lg:block" />
                 <div className="md:col-span-2">
                   <button
                     onClick={handleShowMore}
-                    className="py-2 y-80 text-note-2 underline cursor-pointer text-color-2 hover:text-color-1 transition-all duration-300"
+                    className="h-8 text-note-2 underline cursor-pointer text-color-2 hover:text-color-1 transition-all duration-300"
                   >
                     Mostrar mais ({projects.length - visibleCount} restantes)
                   </button>
                 </div>
-              </>
+              </div>
             )}
           </div>
         </div>
