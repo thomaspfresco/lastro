@@ -34,7 +34,7 @@ def initScheduler(app):
     scheduler.add_job(
         func=lambda: jobToAppContext(app, fetchCSV),
         trigger='cron',
-        hour=0, minute=35,
+        hour=4, minute=0,
         timezone='Europe/Lisbon',
         id='fetchCSV_job',
         name='Fetch CSV Data',
