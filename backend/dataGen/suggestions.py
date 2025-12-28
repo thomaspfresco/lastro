@@ -98,22 +98,7 @@ def hasFieldData(field, project):
     return True
 
 async def buildQueryAndExecute(field, project):
-    """
-    Build and execute a SQL query for a given field and project.
-    Returns a tuple: (query_string, results_array)
 
-    This avoids double execution by running the query once and returning both
-    the query string (for description generation) and results.
-
-    Strategy:
-    1. If field is "date" -> match by year only using LIKE 'year-%'
-    2. If value contains ", " -> split and use OR
-    3. Otherwise -> try exact LIKE match
-    4. If no results -> split by space and use OR (ignoring insignificant words)
-
-    project: The project object to build the query from
-    field: The field name to query on
-    """
     value = getattr(project, field, None)
 
     if not value:
@@ -238,10 +223,7 @@ async def getDirect(project):
     return selected
 
 async def executeDisruptiveQuery(option, project):
-    """
-    Execute a single disruptive query and return the result.
-    Returns (option, description, projects) or None if no results.
-    """
+
     # Pre-check if both fields have data
     if not hasFieldData(option["matchField"], project):
         return None
@@ -348,20 +330,12 @@ async def getDisruptive(project):
 # ==================================================
 
 def getSuggestions(project):
-    """
-    Generate suggestions for a project.
-    Returns a list of 5 suggestions (3 direct + 2 disruptive),
-    each with a description and projects array.
-    Suggestions and projects are randomly ordered.
-    """
+
     # Run async functions in sync context
     return asyncio.run(_getSuggestionsAsync(project))
 
 async def _getSuggestionsAsync(project):
-    """
-    Async implementation of getSuggestions.
-    Runs direct and disruptive suggestions in parallel.
-    """
+
     # Get 3 direct and 2 disruptive suggestions concurrently
     direct, disruptive = await asyncio.gather(
         getDirect(project),

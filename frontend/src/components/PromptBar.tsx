@@ -14,7 +14,7 @@ const PromptBar = () => {
   const { messages, addMessage, isLoading, setIsLoading } = useChat();
   const ip = usePublicIP(cookieAccepted);
 
-  const historySize = 2;
+  const historySize = 1;
 
   useEffect(() => {
     setCookieAccepted(Cookies.get("lastro-userDataConsent") === "true");
@@ -33,7 +33,9 @@ const PromptBar = () => {
       const response = await sendQuery({
         cookieConsent: cookieAccepted,
         userIp: ip,
-        previousPrompts: messages.slice(-historySize).map((msg) => msg.prompt),
+        previousQueries: messages
+          .slice(-historySize)
+          .map((msg) => msg.queries?.[0] || ""),
         currentPrompt: prompt,
       });
 

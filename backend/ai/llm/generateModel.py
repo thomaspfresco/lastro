@@ -6,13 +6,13 @@
 import subprocess
 import sys
 
-BASE_MODEL = 'qwen2.5-coder:7b'
+BASE_MODEL = 'llama3.1:8b'
 CUSTOM_MODEL_NAME = 'sql-agent-lastro'
 
 COLUMN_DESCRIPTIONS = """
   title - Título do vídeo/projeto
   author - Nome do autor/artista
-  category - Lista de Categorias, palavras semelhantes às seguintes: Artesanato, Dança, Comida, Gastronomia, Histórias, Música, Tradição Oral, Poesia, Práticas Religiosas, Ritos, Paisagens Sonoras, ...
+  category - Lista de Categorias, palavras semelhantes às seguintes: Artesanato, Dança, Comida, Gastronomia, Histórias, Música, Tradição Oral, Poesia, Religião, Ritos, Paisagens Sonoras, ...
   date - Data de publicação (yyyy-mm-dd)
   direction - Lista de realizadores
   sound - Lista de técnicos/engenheiros de som
@@ -27,104 +27,49 @@ COLUMN_DESCRIPTIONS = """
 def create_modelfile():
     
     modelfile_content = f'''FROM {BASE_MODEL}
+PARAMETER temperature 0.0
+PARAMETER num_ctx 8192
 
-    SYSTEM """You are a SQLite query generator for a Portuguese (PORTUGAL, NOT BRAZIL) cultural video repository.
+SYSTEM """
+You are a specialized SQL query generator. Your ONLY task is to output three lines: LOGIC, DESC, and QUERY, strictly following the FINAL OUTPUT FORMAT.
+Your output MUST contain plain text only. DO NOT use Markdown formatting, bolding, italics, headings (#), or bullet points (*).
 
-    IMPORTANT LANGUAGE NOTES:
-    - This is PORTUGAL Portuguese, NOT Brazilian Portuguese
-    - Use "viola" NOT "violão" (violão is Brazilian)
-    - Use "guitarra" NOT "violão"
-    - Never translate user terms to Brazilian variants
+Your input variables are <ACTION>, <PREV_SQL>, and <PROMPT>.
 
-    IMPORTANT SEARCH LOGIC:
-    - Words like "vídeos", "projetos", "mostrar", "ver", "todos" are SEARCH KEYWORDS, NOT content
-    - DO NOT put search keywords in title, author, category, etc.
-    - Example: "vídeos de dança" means search for category='dança', NOT title='vídeos'
-    - Example: "projetos em Lisboa" means location='Lisboa', NOT title='projetos'
+1. SCHEMA
+Table: projects
+Columns:
+{COLUMN_DESCRIPTIONS}
 
-    Database Schema (all columns are VARCHAR):
-    Table: projects
-    Columns:
-    {COLUMN_DESCRIPTIONS}
+2. CORE RULES
+A. OPERATOR: Use LIKE '%%'. NEVER use =.
+B. FILTERS: Filter noise from <PROMPT>. Map Nouns/Artists/Pessoas to 'author'. Map general CONTEÚDO/TEMAS/GENEROS/LOCAIS (e.g., 'religiosos', 'Lisboa') usando o campo **category** ou **location**. 'sem' maps to 'NOT LIKE'.
+C. NAMES: Use FULL names in LIKE clauses.
 
-    ⚠️ CONTEXT ACCUMULATION - MANDATORY RULES ⚠️
+3. ACTION EXECUTION
+A. MERGE:
+(1) Get the old WHERE clause from <PREV_SQL> and CORRECT any '=' to 'LIKE '%%''.
+(2) Clean the new condition from <PROMPT>.
+(3) The final query structure MUST be: SELECT * FROM projects WHERE (OLD_CORRECTED_WHERE_CLAUSE) AND NEW_CLEAN_CONDITION.
+(4) Final query must contain WHERE EXACTLY ONCE.
 
-    Rule #1: Look at ONLY the LAST line in PREVIOUS (ignore all other previous prompts)
-    Rule #2: Read CURRENT prompt first word
-    Rule #3: Is first word "com" OR "e" OR "em" OR "de" OR "na" OR "no" OR "do" OR "da" OR "à" OR "ao"?
+B. RESET:
+(1) ABSOLUTELY IGNORE <PREV_SQL>.
+(2) Generate the query ONLY based on the FILTERED content of <PROMPT>.
+(3) PRIORIDADE DE MAPPEAMENTO: Se o prompt for um NOME, mapeie para 'author'. Se for um TEMA/CONTEÚDO/GENERO (e.g., 'religiosos'), mapeie para **'category'** usando os termos listados no SCHEMA (e.g., 'religiosos' -> 'Religião').
 
-    → If YES: Combine CURRENT with LAST PREVIOUS prompt only
-    → If NO: IGNORE ALL PREVIOUS, generate query ONLY from CURRENT
+4. FINAL OUTPUT FORMAT (STRICTLY THREE LINES, PLAIN TEXT)
 
-    CRITICAL: When you generate a NEW query (not accumulating), ALL previous context is RESET!
-
-    DO NOT accumulate if CURRENT does not start with connecting word!
-    DO NOT try to be smart or infer connections!
-    DO NOT accumulate just because topics seem related!
-    DO NOT keep filters from prompts before the last one unless CURRENT starts with connecting word!
-
-    TEST YOUR UNDERSTANDING:
-
-    ✅ CORRECT ACCUMULATION:
-    PREVIOUS: "jorge"
-    CURRENT: "com guitarra"
-    → First word is "com" → ACCUMULATE with LAST → WHERE author LIKE '%jorge%' AND instruments LIKE '%guitarra%'
-
-    ✅ CORRECT ACCUMULATION:
-    PREVIOUS: "lisboa"
-    CURRENT: "e porto"
-    → First word is "e" → ACCUMULATE with LAST → WHERE location LIKE '%lisboa%' OR location LIKE '%porto%'
-
-    ❌ WRONG - Must be NEW QUERY:
-    PREVIOUS: "lisboa"
-    CURRENT: "alentejo"
-    → First word is "alentejo" (NOT connecting word!) → NEW QUERY → WHERE location LIKE '%alentejo%'
-
-    ❌ WRONG - Must be NEW QUERY (context reset example):
-    PREVIOUS (multiple lines):
-    lisboa
-    alentejo
-    CURRENT: "coro"
-    → First word is "coro" (NOT connecting word!) → NEW QUERY → WHERE title LIKE '%coro%'
-    → DO NOT use "lisboa"! Only "alentejo" was the last prompt, but since "coro" doesn't start with connecting word, ignore ALL!
-
-    ❌ WRONG - Must be NEW QUERY:
-    PREVIOUS: "carlos"
-    CURRENT: "comida"
-    → First word is "comida" (NOT connecting word!) → NEW QUERY → WHERE category LIKE '%comida%'
-
-    ❌ WRONG - Must be NEW QUERY:
-    PREVIOUS: "carlos\ncom viola"
-    CURRENT: "burro"
-    → First word is "burro" (NOT connecting word!) → NEW QUERY → WHERE title LIKE '%burro%'
-    → DO NOT keep "carlos" or "viola"!
-
-    ❌ WRONG - Search keyword handling:
-    CURRENT: "vídeos em Viana de Castelo"
-    → WRONG: title LIKE '%vídeos%' (vídeos is search keyword!)
-    → CORRECT: location LIKE '%Viana de Castelo%'
-
-    ❌ WRONG - Language handling:
-    CURRENT: "com viola"
-    → WRONG: instruments LIKE '%violão%' (violão is Brazilian!)
-    → CORRECT: instruments LIKE '%viola%'
-
-    Important Query Rules:
-    1. Always do SELECT * from projects WHERE [...]
-    2. For text matching, use LIKE '%word%' for each term
-    3. Current year is 2025
-
-    Response format ALWAYS:
-    QUERY: [SQL statement]
-    DESC: [2-5 words description]
-    (repeat for each alternative query if needed)
-
-    PARAMETER temperature 1.0"""
-    '''
+LOGIC: [The value from <ACTION>]
+DESC: [MANDATO LINGUÍSTICO: PORTUGUÊS PORTUGAL. A descrição deve ser SIMPLES, CONVERSACIONAL, e obrigatoriamente INCLUIR TODOS OS TERMOS DE FILTRO SIGNIFICATIVOS da consulta SQL final.]
+QUERY: [The final SQLite statement. Must start with SELECT and end without a semicolon (;) or any extra punctuation.]
+"""
+'''
     
     with open('Modelfile', 'w', encoding='utf-8') as f:
         f.write(modelfile_content)
-    
+
+# create_modelfile_codellama7b_optimized()
 def create_model():    
     try:
         result = subprocess.run(

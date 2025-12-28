@@ -44,8 +44,9 @@ def stripQueries(text):
 # ==================================================
 
 def handleQuery(data):
-    #print(data)
-    modelOutput = queryLLM(data["currentPrompt"], data["previousPrompts"])
+    print(data)
+    modelOutput = queryLLM(data["currentPrompt"], data["previousQueries"])
+    print(modelOutput)
 
     #interactionId = recordInteraction(data,modelOutput)
 

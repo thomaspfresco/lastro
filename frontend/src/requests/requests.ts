@@ -19,7 +19,7 @@ export async function getRandomProjects(count: number) {
 export async function sendQuery(data: {
   cookieConsent: boolean;
   userIp: string;
-  previousPrompts: string[];
+  previousQueries: string[];
   currentPrompt: string;
 }): Promise<QueryResponse> {
   return postRequest<QueryResponse>("/query", data);
