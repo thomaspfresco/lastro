@@ -104,7 +104,7 @@ const Explore: React.FC = () => {
           messages.length > 0 || isLoading ? "opacity-0" : "opacity-100"
         }`}
       >
-        <p className="text-body-1 text-color-1 opacity-50">
+        <p className="text-body-2 text-color-1 opacity-50">
           Escreva na barra de pesquisa para começar.
         </p>
       </div>
@@ -125,19 +125,13 @@ const Explore: React.FC = () => {
                   }}
                   data-idx={idx}
                   data-search-header
-                  className="sticky top-[var(--menu-height)] bg-color-bg z-10 py-3"
+                  className="sticky top-[var(--menu-height)] bg-color-bg z-10 pt-3"
                 >
                   <div className="opacity-50">
-                    <p className="text-note-3 uppercase pb-1">
-                      pesquisa #{(msg.id ?? idx) + 1} —
-                      {" " + msg.results.flat().length + " "}
-                      {msg.results.flat().length === 1
-                        ? "potencial resultado"
-                        : "potenciais resultados"}
+                    <p className="text-note-2 uppercase pb-1">
+                      pesquisa #{(msg.id ?? idx) + 1} — {msg.prompt}
                     </p>
-                    <h2 className="text-body-1">{msg.prompt}</h2>
                   </div>
-                  <span className="block h-px w-full bg-color-1 opacity-50 mt-3" />
                 </div>
 
                 {msg.results.map((projects, resultIdx) => {

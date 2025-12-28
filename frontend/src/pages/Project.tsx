@@ -96,7 +96,7 @@ const Project: React.FC = () => {
           ref={headerRef}
           className="sticky top-[var(--menu-height)] bg-color-bg z-2 py-3"
         >
-          <div className="flex items-start gap-3">
+          <div className="flex flex-col gap-3">
             <button
               onClick={() => navigate("/explorar")}
               className="text-2xl hover:opacity-70 transition-opacity mt-px cursor-pointer"
@@ -105,12 +105,12 @@ const Project: React.FC = () => {
               <BiArrowBack />
             </button>
             <div>
-              <h1 className="text-title-2">
-                {project.title == "" ? "Sem título registado" : project.title}
-              </h1>
-              <p className="text-note-1 opacity-50 mt-1 mb-3">
+              <p className="text-note-2 opacity-50">
                 {project.author == "" ? "Sem autor registado" : project.author}
               </p>
+              <h1 className="text-title-2 mt-1 mb-3">
+                {project.title == "" ? "Sem título registado" : project.title}
+              </h1>
             </div>
           </div>
 

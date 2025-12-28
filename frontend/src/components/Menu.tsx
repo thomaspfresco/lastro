@@ -17,14 +17,14 @@ const Menu = () => {
             href="https://amusicaportuguesaagostardelapropria.org/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-note-2 hidden md:flex flex-col uppercase gap-0.5 hover:opacity-50 transition-opacity"
+            className="text-note-3 hidden md:flex flex-col uppercase gap-0.5 hover:opacity-50 transition-opacity"
           >
             <span>A Música Portuguesa</span>
             <span>A Gostar Dela Própria</span>
           </a>
         </div>
 
-        <nav className="flex flex-row items-end gap-2 text-body-2 uppercase">
+        <nav className="flex flex-row items-end gap-2 text-body-3 uppercase">
           <Link
             to="/explorar"
             className={`p-2 transition-opacity ${

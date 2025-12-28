@@ -71,7 +71,7 @@ const PromptBar = () => {
             onKeyDown={handleKeyDown}
             placeholder="Procure qualquer coisa..."
             disabled={!ip || isLoading}
-            className={`flex-1 bg-transparent pl-6 pb-0.5 text-color-1 text-body-1 placeholder:text-color-2/40 focus:outline-none transition-all ${
+            className={`flex-1 bg-transparent pl-6 text-color-1 text-body-2 placeholder:text-color-2/40 focus:outline-none transition-all ${
               isLoading ? "opacity-40" : "opacity-100"
             }`}
           />

@@ -76,7 +76,8 @@ const ProjectBlock: React.FC<ProjectBlockProps> = ({
         className="sticky bg-color-bg z-10 pt-px pb-3"
         style={{ top: `calc(var(--menu-height) + ${topOffset}px)` }}
       >
-        <div className="flex items-start gap-4 mb-3">
+        <div className="flex justify-between gap-4 mb-3">
+          <h2 className="text-title-2">{title}</h2>
           <button
             onClick={handleToggle}
             className="text-xl hover:opacity-70 transition-opacity mt-[2px] cursor-pointer"
@@ -88,8 +89,6 @@ const ProjectBlock: React.FC<ProjectBlockProps> = ({
               }`}
             />
           </button>
-
-          <h2 className="text-title-2">{title}</h2>
         </div>
 
         <span className="block h-px w-full bg-color-1 opacity-50" />
@@ -109,19 +108,20 @@ const ProjectBlock: React.FC<ProjectBlockProps> = ({
           <div className="flex flex-col gap-2 relative z-0">
             {Array.from({ length: Math.ceil(visibleCount / 2) }).map(
               (_, rowIndex) => {
-                const startIndex = rowIndex * 2;
-                const rowProjects = projects.slice(startIndex, startIndex + 2);
+                const startIndex = rowIndex * 1;
+                const rowProjects = projects.slice(startIndex, startIndex + 1);
 
                 return (
                   <div
                     key={rowIndex}
                     data-row-index={rowIndex}
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 md:gap-6 lg:gap-8"
+                    className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-0 md:gap-6 lg:gap-8"
                   >
                     <div className="hidden lg:block" />
                     {rowProjects.map((project) => (
                       <div key={project.id}>
                         <ProjectCard project={project} />
+                        <span className="block h-px w-full bg-color-1 opacity-50 mt-2" />
                       </div>
                     ))}
                   </div>
@@ -130,9 +130,9 @@ const ProjectBlock: React.FC<ProjectBlockProps> = ({
             )}
 
             {hasMore && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-0 md:gap-x-6 lg:gap-x-8 pt-4 lg:pt-6">
+              <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-x-0 md:gap-x-6 lg:gap-x-8 pt-4 lg:pt-6">
                 <div className="hidden lg:block" />
-                <div className="md:col-span-2">
+                <div>
                   <button
                     onClick={handleShowMore}
                     className="h-8 text-note-2 underline cursor-pointer text-color-2 hover:text-color-1 transition-all duration-300"

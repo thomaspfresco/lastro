@@ -155,35 +155,42 @@ body {
 @utility text-body-1 {
   font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
   font-weight: 400;
-  font-size: 1rem; /* 16px */
+  font-size: 1.2rem; /* 16px */
   line-height: 1.2;
 }
 
 @utility text-body-2 {
   font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
   font-weight: 400;
-  font-size: 0.75rem; /* 12px */
+  font-size: 1rem; /* 12px */
+  line-height: 1.2;
+}
+
+@utility text-body-3 {
+  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  font-size: .85rem; /* 12px */
   line-height: 1.2;
 }
 
 @utility text-note-1 {
   font-family: "GeistMono", ui-monospace, monospace;
   font-weight: 400;
-  font-size: 1rem; /* 16px */
+  font-size: 1.1rem; /* 16px */
   line-height: 1.1;
 }
 
 @utility text-note-2 {
   font-family: "GeistMono", ui-monospace, monospace;
   font-weight: 400;
-  font-size: 0.75rem; /* 12px */
-  line-height: 1;
+  font-size: 0.85rem; /* 12px */
+  line-height: 1.2;
 }
 
 @utility text-note-3 {
   font-family: "GeistMono", ui-monospace, monospace;
   font-weight: 400;
-  font-size: 0.625rem; /* 10px */
+  font-size: 0.75rem; /* 10px */
   line-height: 1;
 }
 
