@@ -31,11 +31,11 @@ const About: React.FC<ProjectBlockProps> = ({
             <a href="https://linktr.ee/mpagdp" target="_blank">Mais</a>
           </div>
           <div className="flex flex-col justify-start gap-3">
-            <img
+            <a href="https://amusicaportuguesaagostardelapropria.org/" target="_blank"><img
               src={logoSvg}
               alt="Loading"
               className={`relative z-10 w-10 h-10 transition-opacity duration-500`}
-            />
+            /></a>
             <p>Com ❤︎ por <a href="" target="_blank">Thomas Fresco</a> e <a href="" target="_blank">Fábio Gouveia</a>.</p>
           </div>
         </div>

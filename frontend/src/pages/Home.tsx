@@ -41,10 +41,10 @@ const Home = () => {
   return <div className="grid-setup !pt-[var(--menu-height)]">
     <ProjectHome currentProjectId={id} />
 
-    <img src={logoSvg}
+    <a href="https://amusicaportuguesaagostardelapropria.org/" target="_blank"><img src={logoSvg}
       alt="Loading"
       className={`relative z-10 w-20 h-20 mx-auto transition-opacity duration-500 mb-12 mt-[calc(var(--spacing)*-20)]`}
-      />
+      /></a>
 
     <div className="relative mt-8">
         {isLoading && <LoadingState messages={[["Carregando..."]]} />}
