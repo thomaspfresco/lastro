@@ -104,17 +104,19 @@ export default function ProjectFooter({
           </div>
         </div>
 
-        <SlArrowDown
-          className="mb-[calc(var(--menu-height)*2)] text-white h-6 w-6"
-          style={{
-            opacity: 0,
-            animation: `
-              fadeIn 2s ease forwards 4s,
-              bounce 2s ease-out infinite
-            `,
-          }}
+        <a href="#projects"
           aria-label="Scroll down"
-        />
+          className="inline-block scroll-smooth">
+          <SlArrowDown
+            className="mb-[calc(var(--menu-height)*2)] text-white h-6 w-6"
+            style={{
+              opacity: 0,
+              animation: 
+                `fadeIn 2s ease forwards 2s,
+                bounce 2s ease-out infinite`,
+            }}
+          />
+        </a>
       </div>
     </div>
   );

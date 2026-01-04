@@ -40,7 +40,7 @@ const Home = () => {
   return <div className="grid-setup !pt-[var(--menu-height)]">
     <ProjectHome currentProjectId={id} />
 
-    <div className="relative mt-8">
+    <div className="relative mt-8 scroll-smooth scroll-mt-[var(--menu-height)]" id="projects">
         {isLoading && <LoadingState messages={[["Carregando..."]]} />}
 
         {randomProjects && (
