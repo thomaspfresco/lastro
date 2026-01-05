@@ -16,7 +16,7 @@ const About: React.FC<ProjectBlockProps> = ({
     <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-0 md:gap-6 lg:gap-8">
       <div className="sticky order-2 md:order-1 md:h-0 flex flex-col"
         style={{ top: `calc(var(--menu-height) + ${topOffset}px)` }}>
-        <div className="bg-color-bg z-10 pt-px pb-3">
+        <div className="bg-color-bg z-20 pt-px pb-3">
           <h2 className="text-title-2 mb-3">Contactos</h2>
           <span className="block h-px w-full bg-color-1 opacity-50" />
         </div>
@@ -44,8 +44,8 @@ const About: React.FC<ProjectBlockProps> = ({
               className={`relative z-10 w-10 h-10 transition-opacity duration-500`}
             /></a>
             <p>Com ❤︎ por <a className="cursor-pointer text-color-2 hover:text-color-1 transition-all duration-300"
-            href="" target="_blank">Thomas Fresco</a> e <a className="cursor-pointer text-color-2 hover:text-color-1 transition-all duration-300"
-            href="" target="_blank">Fábio Gouveia</a>.</p>
+            href="https://thomasfresco.pt/" target="_blank">Thomas Fresco</a> e <a className="cursor-pointer text-color-2 hover:text-color-1 transition-all duration-300"
+            href="https://fabiogouveia.pt/" target="_blank">Fábio Gouveia</a>.</p>
           </div>
         </div>
       </div>
