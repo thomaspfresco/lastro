@@ -268,7 +268,7 @@ def handleQuery(data):
 
         # Check if we should add keyword expansion
         # Count total projects and main terms
-        from dataGen.queryFallback import extractTermsFromQueries, buildMultiTermFallback
+        from dataGen.queryFallback import extractTermsFromQueries, buildMultiTermFallback, hasDuplicateProjects
 
         total_projects = sum(len(queryResult) for queryResult in rawResults)
         extracted = extractTermsFromQueries(result["queries"])
@@ -279,18 +279,25 @@ def handleQuery(data):
 
         # If 2 or fewer main terms and less than 10 total projects, add keyword search
         if len(main_terms) <= 2 and len(main_terms) > 0 and total_projects < 10:
-            print(f"DEBUG: Adding keyword expansion group for terms: {main_terms}")
+            print(f"DEBUG: Checking keyword expansion group for terms: {main_terms}")
 
             # Build keyword search with OR joining all terms
             keyword_query_info = buildMultiTermFallback(main_terms, date_filter)
             keyword_results = executeQueriesSQL([keyword_query_info['query']])[0]
 
-            # Only add if we got results from keyword search
+            # Only add if we got results from keyword search and they're not duplicates
             if keyword_results and len(keyword_results) > 0:
-                print(f"DEBUG: Keyword expansion found {len(keyword_results)} additional projects")
-                result["queries"].append(keyword_query_info['query'])
-                result["descriptions"].append(keyword_query_info['description'])
-                rawResults.append(keyword_results)
+                # Check if keyword results are duplicate of existing results
+                existingGroups = [{'results': r} for r in rawResults]
+                isDuplicate = hasDuplicateProjects(keyword_results, existingGroups)
+
+                if isDuplicate:
+                    print(f"DEBUG: Skipping keyword expansion - duplicate projects ({len(keyword_results)} projects)")
+                else:
+                    print(f"DEBUG: Adding keyword expansion with {len(keyword_results)} additional projects")
+                    result["queries"].append(keyword_query_info['query'])
+                    result["descriptions"].append(keyword_query_info['description'])
+                    rawResults.append(keyword_results)
 
     # Shuffle results before serialization
     for queryResult in rawResults:

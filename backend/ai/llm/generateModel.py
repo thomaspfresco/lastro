@@ -25,7 +25,7 @@ PARAMETER temperature 0.0
 PARAMETER num_ctx 2048
 
 SYSTEM """
-Generate SQL queries for the projects table. Output exactly 3 lines: LOGIC, DESC, QUERY.
+Generate SQL queries for the projects table. Output exactly 2 lines: DESC, QUERY.
 
 TABLE:
 name: projects
@@ -33,26 +33,46 @@ structure: {COLUMN_DESCRIPTIONS}
 
 RULES:
 1. Always use LIKE '%value%' for text fields (never use =)
-2. Absolute sorting queries:
-   - "o mais recente/último" → ORDER BY date DESC LIMIT 1
-   - "o mais antigo/primeiro" → ORDER BY date ASC LIMIT 1
+2. Date filtering:
+   - Specific year: date LIKE '%2023%'
+   - Before date: date < 'YYYY-MM-DD'
+   - After date: date > 'YYYY-MM-DD'
+3. Absolute sorting queries:
+   - "o mais recente/último" -> ORDER BY date DESC LIMIT 1
+   - "o mais antigo/primeiro" -> ORDER BY date ASC LIMIT 1
 
 ACTIONS:
 <ACTION>RESET</ACTION> = Build fresh query from <PROMPT> only
 <ACTION>MERGE</ACTION> = Copy WHERE from <PREV_SQL>, add new condition with AND
 
 EXAMPLES:
-RESET: <PROMPT>="carlos" → WHERE author LIKE '%carlos%'
-RESET: <PROMPT>="Jorge Cruz" → WHERE author LIKE '%Jorge Cruz%'
-RESET: <PROMPT>="na praia" → WHERE location LIKE '%praia%'
-RESET: <PROMPT>="fado" → WHERE title LIKE '%fado%' OR category LIKE '%fado%'
-RESET: <PROMPT>="carta de amor" → WHERE title LIKE '%carta de amor%'
-RESET: <PROMPT>="guitarra braguesa" → WHERE instruments LIKE '%guitarra%' or instruments LIKE '%braguesa%'
+RESET: <PROMPT>="carlos" -> WHERE author LIKE '%carlos%'
+       DESC: Trabalhos de Carlos
+RESET: <PROMPT>="Jorge Cruz" -> WHERE author LIKE '%Jorge Cruz%'
+       DESC: Projetos de Jorge Cruz
+RESET: <PROMPT>="na praia" -> WHERE location LIKE '%praia%'
+       DESC: Gravado na praia
+RESET: <PROMPT>="fado" -> WHERE title LIKE '%fado%' OR category LIKE '%fado%'
+       DESC: Fado no título ou categoria
+RESET: <PROMPT>="gato" -> WHERE title LIKE '%gato%' OR author LIKE '%gato%'
+       DESC: Gato no título ou autor
+RESET: <PROMPT>="carta de amor" -> WHERE title LIKE '%carta de amor%'
+       DESC: Carta de amor no título
+RESET: <PROMPT>="guitarra braguesa" -> WHERE instruments LIKE '%guitarra%' or instruments LIKE '%braguesa%'
+       DESC: Guitarra ou braguesa nos instrumentos
+RESET: <PROMPT>="guitarra de fado" -> WHERE instruments LIKE '%guitarra%' or instruments LIKE '%fado%'
+       DESC: Guitarra ou fado nos instrumentos
+RESET: <PROMPT>="dança antes de 2024" -> WHERE category LIKE '%dança%' AND date < '2024-01-01'
+       DESC: Dança publicada antes de 2024
+RESET: <PROMPT>="em 2023" -> WHERE date LIKE '%2023%'
+       DESC: Publicado em 2023
+RESET: <PROMPT>="vídeo mais recente de filipe sambado" -> WHERE author LIKE '%filipe sambado%' ORDER BY date DESC LIMIT 1
+       DESC: O mais recente de Filipe Sambado
 MERGE: <PREV_SQL>="WHERE author LIKE '%carlos%'" + <PROMPT>="em Lisboa" → WHERE author LIKE '%carlos%' AND location LIKE '%Lisboa%'
+       DESC: Carlos gravado em Lisboa
 
 OUTPUT FORMAT:
-LOGIC: [RESET or MERGE]
-DESC: [Casual Portuguese description - no "procurar/buscar", no punctuation, describe what's shown. Examples: "Projetos do Carlos", "Vídeos religiosos", "O projeto mais antigo da base de dados"]
+DESC: [Match user intent exactly - describe what they're looking for in casual Portuguese, no punctuation]
 QUERY: SELECT * FROM projects WHERE ... (or just SELECT * FROM projects ORDER BY ...)
 """
 '''

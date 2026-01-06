@@ -209,6 +209,48 @@ def buildMultiTermFallback(terms, dateFilter=None):
         'column': 'keywords'
     }
 
+def buildSplitWordsFallback(term, dateFilter=None, maxWords=5):
+    """
+    Level 2.5 Fallback: Split multi-word term into individual words.
+    Search keywords with OR joining individual words (limit to maxWords).
+
+    Args:
+        term: Multi-word search term to split
+        dateFilter: Optional year/date to filter by
+        maxWords: Maximum number of words to use (default 5)
+
+    Returns:
+        dict: Query with split words joined by OR, or None if single word
+    """
+    # Split by spaces and filter out stop words/very short words
+    words = [w.strip() for w in term.split() if len(w.strip()) > 2]
+
+    # Only use this fallback if we have multiple meaningful words
+    if len(words) <= 1:
+        return None
+
+    # Limit to maxWords
+    words = words[:maxWords]
+
+    # Build OR conditions for all words
+    conditions = [f"keywords LIKE '%{word}%'" for word in words]
+    whereClause = " OR ".join(conditions)
+
+    query = f"SELECT * FROM projects WHERE ({whereClause})"
+
+    if dateFilter:
+        query += f" AND date LIKE '%{dateFilter}%'"
+
+    query += ";"
+
+    wordsStr = "', '".join(words)
+    return {
+        'query': query,
+        'description': f"Projetos relacionados a '{wordsStr}'",
+        'column': 'keywords_split',
+        'words': words
+    }
+
 def buildRandomFallback():
     """
     Final Fallback: Return 100 random projects.
@@ -221,6 +263,47 @@ def buildRandomFallback():
         'description': "Sem potenciais resultados para a sua pesquisa. Continue a Explorar!",
         'column': 'random'
     }
+
+# ==================================================
+# Helper Functions
+# ==================================================
+
+def extractProjectIds(results):
+    """
+    Extract project IDs from a result set.
+
+    Args:
+        results: List of project dictionaries
+
+    Returns:
+        set: Set of project IDs
+    """
+    if not results:
+        return set()
+    return {project.get('id') for project in results if project.get('id') is not None}
+
+def hasDuplicateProjects(newResults, existingGroups):
+    """
+    Check if newResults contains exactly the same projects as any existing group.
+
+    Args:
+        newResults: List of projects to check
+        existingGroups: List of existing group dictionaries with 'results' key
+
+    Returns:
+        bool: True if an identical set exists, False otherwise
+    """
+    newIds = extractProjectIds(newResults)
+
+    if not newIds:
+        return False
+
+    for group in existingGroups:
+        existingIds = extractProjectIds(group['results'])
+        if newIds == existingIds:
+            return True
+
+    return False
 
 # ==================================================
 # Main Fallback Orchestrator
@@ -264,29 +347,64 @@ def applyFallback(originalQueries):
         allResults = executeQueriesSQL([q['query'] for q in fallbackQueries])
 
         # Filter out empty results and keep only groups with results
+        # Also check for duplicate project sets
         validGroups = []
         for i, res in enumerate(allResults):
             if res and len(res) > 0:
-                validGroups.append({
-                    'query': fallbackQueries[i]['query'],
-                    'description': fallbackQueries[i]['description'],
-                    'results': res
-                })
+                # Only add if this group doesn't have the same projects as an existing group
+                isDuplicate = hasDuplicateProjects(res, validGroups)
+                if isDuplicate:
+                    print(f"DEBUG FALLBACK: Skipping duplicate group for column '{fallbackQueries[i]['column']}' with {len(res)} projects")
+                else:
+                    print(f"DEBUG FALLBACK: Adding group for column '{fallbackQueries[i]['column']}' with {len(res)} projects")
+                    validGroups.append({
+                        'query': fallbackQueries[i]['query'],
+                        'description': fallbackQueries[i]['description'],
+                        'results': res
+                    })
 
-        print(f"DEBUG FALLBACK: Found {len(validGroups)} groups with results")
+        print(f"DEBUG FALLBACK: Found {len(validGroups)} unique groups with results")
 
-        # If we have 0 or 1 groups with results, add keywords fallback
-        if len(validGroups) <= 1:
-            print(f"DEBUG FALLBACK: Adding keywords fallback")
-            keywordsQuery = buildKeywordsFallback(term, dateFilter)
-            keywordsResults = executeQueriesSQL([keywordsQuery['query']])[0]
+        # Always check keywords fallback, regardless of how many groups we have
+        print(f"DEBUG FALLBACK: Checking keywords fallback (currently have {len(validGroups)} groups)")
+        keywordsQuery = buildKeywordsFallback(term, dateFilter)
+        keywordsResults = executeQueriesSQL([keywordsQuery['query']])[0]
 
-            if keywordsResults and len(keywordsResults) > 0:
+        if keywordsResults and len(keywordsResults) > 0:
+            # Only add if not duplicate
+            isDuplicate = hasDuplicateProjects(keywordsResults, validGroups)
+            if isDuplicate:
+                print(f"DEBUG FALLBACK: Skipping keywords fallback - duplicate projects ({len(keywordsResults)} projects)")
+            else:
+                print(f"DEBUG FALLBACK: Adding keywords fallback with {len(keywordsResults)} projects")
                 validGroups.append({
                     'query': keywordsQuery['query'],
                     'description': keywordsQuery['description'],
                     'results': keywordsResults
                 })
+        else:
+            print(f"DEBUG FALLBACK: Keywords fallback returned no results")
+
+        # If still no results, try splitting multi-word terms
+        if not validGroups:
+            print(f"DEBUG FALLBACK: No results found - trying split words fallback")
+            splitWordsQuery = buildSplitWordsFallback(term, dateFilter)
+
+            if splitWordsQuery:
+                print(f"DEBUG FALLBACK: Split '{term}' into words: {splitWordsQuery['words']}")
+                splitWordsResults = executeQueriesSQL([splitWordsQuery['query']])[0]
+
+                if splitWordsResults and len(splitWordsResults) > 0:
+                    print(f"DEBUG FALLBACK: Split words fallback found {len(splitWordsResults)} projects")
+                    validGroups.append({
+                        'query': splitWordsQuery['query'],
+                        'description': splitWordsQuery['description'],
+                        'results': splitWordsResults
+                    })
+                else:
+                    print(f"DEBUG FALLBACK: Split words fallback returned no results")
+            else:
+                print(f"DEBUG FALLBACK: Term '{term}' is single word - skipping split words fallback")
 
         # If still no results, go to final fallback
         if not validGroups:

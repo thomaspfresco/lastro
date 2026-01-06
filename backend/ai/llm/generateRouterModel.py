@@ -6,24 +6,17 @@
 import subprocess
 import sys
 
-BASE_MODEL = 'llama3.1:8b'
+BASE_MODEL = 'llama3.2:3b'
 CUSTOM_MODEL_NAME = 'context-router-lastro'
 
 def create_modelfile():
     modelfile_content = f'''FROM {BASE_MODEL}
 PARAMETER temperature 0.0
 PARAMETER num_predict 5
-PARAMETER num_ctx 256
-PARAMETER top_p 1.0
-PARAMETER repeat_penalty 1.1
-PARAMETER stop "\\n"
+PARAMETER num_ctx 1024
 
 SYSTEM """
-You are a STRICT comparison router.
-
-Your task is to detect EXPLICIT comparisons ONLY.
-
-You must output EXACTLY ONE of the following labels, and nothing else:
+Detect comparisons in user queries. Output EXACTLY ONE label:
 
 author-equal
 author-different
@@ -37,58 +30,37 @@ date-equal
 date-different
 none-none
 
-CORE RULE (MOST IMPORTANT):
-If the user does NOT explicitly compare something with a previous state,
-output none-none.
+EQUALITY indicators:
+- parecido, semelhante, igual, mesmo, próximo, mais (when with context)
+- With field: "mesmo autor" -> author-equal
+- Without field: "vídeos parecidos" or "mais como este" -> category-equal
 
-Mentioning a topic, category, date, author, location, or instrument
-WITHOUT comparison words does NOT count as a comparison.
+Location patterns:
+- "mais no mesmo sítio" -> location-equal
+- "sítio parecido" -> location-equal
+- "mais em sítio parecido" -> location-equal
+- "outros vídeos neste sítio" -> location-equal
+- "mesmo local" or "local próximo" -> location-equal
 
-You must NEVER infer implicit equality or difference.
+Instruments patterns:
+- "sonoridade parecida" -> instruments-equal
+- "timbre parecido" -> instruments-equal
+- "instrumentos parecidos" -> instruments-equal
 
-Comparison words indicating EQUALITY:
-mesmo
-igual
-iguais
-semelhante
-parecido
-do mesmo tipo
+Author patterns:
+- "outras obras deste autor" -> author-equal
+- "mesmo autor" -> author-equal
 
-Comparison words indicating DIFFERENCE:
-diferente
-outro
-outra
-distinto
+DIFFERENCE words (diferente, distinto):
+- "autor diferente" -> author-different
+- "vídeos completamente diferentes" -> category-different
+- "projetos nada a ver (com este)" -> category-different
 
-VALID EXAMPLES:
-"mesmo autor" → author-equal
-"autor semelhante" → author-equal
-"outro autor" → author-different
-"autor diferente" → author-different
+"outro" alone (without context) means difference:
+- "outro autor" -> author-different
 
-"mesmo tipo" → category-equal
-"categoria semelhante" → category-equal
-"outro tipo" → category-different
-
-"mesmos instrumentos" → instruments-equal
-"instrumentos diferentes" → instruments-different
-
-"mesmo local" → location-equal
-"local diferente" → location-different
-"local próximo" → location-equal
-
-"mesmo ano" → date-equal
-"ano diferente" → date-different
-
-NON-COMPARISON EXAMPLES (ALWAYS none-none):
-"projetos sobre flores"
-"flores"
-"2011"
-"carlos"
-"mar"
-"projetos em lisboa"
-
-If there is ANY doubt, output none-none.
+No comparison words -> none-none
+Examples: "flores", "2011", "carlos", "projetos em lisboa"
 """
 '''
     
