@@ -96,22 +96,30 @@ const Project: React.FC = () => {
           ref={headerRef}
           className="sticky top-[var(--menu-height)] bg-color-bg z-2 py-3"
         >
-          <div className="flex flex-col gap-1">
-            <div className="flex gap-3">
-              <button
-                onClick={() => navigate("/explorar")}
-                className="text-2xl hover:opacity-70 transition-opacity mt-px cursor-pointer"
-                aria-label="Go back"
-              >
-                <BiArrowBack />
-              </button>
+          <div className="flex gap-3 mb-3 items-start">
+            <button
+              onClick={() => {
+                navigate("/explorar");
+                setTimeout(() => {
+                  window.scrollTo({
+                    top: document.documentElement.scrollHeight,
+                    behavior: "smooth",
+                  });
+                }, 500);
+              }}
+              className="text-2xl hover:opacity-70 transition-opacity cursor-pointer"
+              aria-label="Go back"
+            >
+              <BiArrowBack />
+            </button>
+            <div className="flex flex-col gap-1">
               <h1 className="text-title-2">
                 {project.title == "" ? "Sem título registado" : project.title}
               </h1>
+              <p className="text-note-1 opacity-50">
+                {project.author == "" ? "Sem autor registado" : project.author}
+              </p>
             </div>
-            <p className="text-note-1 opacity-50 mt-1 mb-3">
-              {project.author == "" ? "Sem autor registado" : project.author}
-            </p>
           </div>
 
           <span className="block h-px w-full bg-color-1 opacity-50" />

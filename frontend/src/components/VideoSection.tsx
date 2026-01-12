@@ -2,6 +2,14 @@ interface VideoSectionProps {
   project: Project;
 }
 
+function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+}
+
 export default function VideoSection({ project }: VideoSectionProps) {
   return (
     <div className="mb-12 grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
@@ -30,7 +38,7 @@ export default function VideoSection({ project }: VideoSectionProps) {
             {project.date && project.date !== "" && (
               <div>
                 <p className="text-note-3 uppercase opacity-50 mb-0.5">Data</p>
-                <p className="text-body-1">{project.date}</p>
+                <p className="text-body-1">{formatDate(project.date)}</p>
               </div>
             )}
           </div>

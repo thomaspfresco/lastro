@@ -8,10 +8,12 @@ import { SlArrowDown } from "react-icons/sl";
 
 interface ProjectFooterProps {
   currentProjectId?: string;
+  onVideoReady?: () => void;
 }
 
 export default function ProjectFooter({
   currentProjectId,
+  onVideoReady,
 }: ProjectFooterProps) {
   const navigate = useNavigate();
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -36,13 +38,16 @@ export default function ProjectFooter({
   useEffect(() => {
     if (iframeRef.current && videoId) {
       const player = new Player(iframeRef.current);
-      player.on("play", () => setVideoStarted(true));
+      player.on("play", () => {
+        setVideoStarted(true);
+        onVideoReady?.();
+      });
 
       return () => {
         player.destroy();
       };
     }
-  }, [videoId]);
+  }, [videoId, onVideoReady]);
 
   if (!videoId) return null;
 
@@ -74,13 +79,23 @@ export default function ProjectFooter({
       <div className="absolute top-0 w-screen h-[100vh] bg-gradient-to-b from-transparent to-color-bg z-0" />
 
       <div className="relative z-10 flex flex-col items-center justify-between h-full text-color-1 text-center px-8 pt-[var(--menu-height)]">
-        <a href="https://amusicaportuguesaagostardelapropria.org/" target="_blank"><img src={logoSvg}
-        className={`relative z-10 w-15 h-15 mx-auto transition-opacity duration-500 mt-12`}
-        /></a>
+        <a
+          href="https://amusicaportuguesaagostardelapropria.org/"
+          target="_blank"
+        >
+          <img
+            src={logoSvg}
+            className={`relative z-10 w-15 h-15 mx-auto transition-opacity duration-500 mt-12`}
+          />
+        </a>
         <div className="flex flex-col items-center">
-          <h1 className="text-title-1 font-bold mb-6 whitespace-pre-line w-[calc(100vw-var(--grid-x-padding-mobile)*2)] md:w-[80%] max-w-[1024px]">LASTRO</h1>
-          <h2 className="text-title-2 mb-12 whitespace-pre-line w-[calc(100vw-var(--grid-x-padding-mobile)*2)] md:w-[80%] max-w-[1024px]">
-            {"Motor de busca da Música Portuguesa a Gostar Dela Própria."}
+          <h1 className="text-title-1 font-bold mb-2 whitespace-pre-line">
+            LASTRO
+          </h1>
+          <h2 className="text-body-1 mb-12 whitespace-pre-line opacity-50">
+            {
+              "O motor de busca inteligente da\n Música Portuguesa a Gostar Dela Própria."
+            }
           </h2>
 
           <div className="flex gap-4 flex-wrap justify-center text-body-1">
@@ -104,19 +119,25 @@ export default function ProjectFooter({
           </div>
         </div>
 
-        <a href="#projects"
+        <button
+          onClick={() => {
+            document.getElementById("projects")?.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          }}
           aria-label="Scroll down"
-          className="inline-block scroll-smooth">
+          className="mb-[calc(var(--menu-height)*1.6)] inline-block cursor-pointer"
+        >
           <SlArrowDown
-            className="mb-[calc(var(--menu-height)*2)] text-white h-6 w-6"
+            className="text-white h-10 w-10 p-2"
             style={{
               opacity: 0,
-              animation: 
-                `fadeIn 2s ease forwards 2s,
+              animation: `fadeIn 2s ease forwards 2s,
                 bounce 2s ease-out infinite`,
             }}
           />
-        </a>
+        </button>
       </div>
     </div>
   );

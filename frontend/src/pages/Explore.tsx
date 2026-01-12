@@ -168,15 +168,19 @@ const Explore: React.FC = () => {
                   className="sticky top-[var(--menu-height)] bg-color-bg z-10 py-3"
                 >
                   <div className="opacity-50">
-                    <p className="text-note-3 uppercase pb-1">
-                      pesquisa #{(msg.id ?? idx) + 1}{msg.contextProject && (
-                        <span> — <button
+                    <p className="text-note-3 uppercase">
+                      pesquisa #{(msg.id ?? idx) + 1}
+                      {msg.contextProject && (
+                        <span>
+                          {" "}
+                          —{" "}
+                          <button
                             onClick={() =>
                               navigate(`/projetos/${msg.contextProject!.id}`)
                             }
                             className="text-note-2 text-color-2 hover:text-color-1 transition-colors group"
                           >
-                            <span className="opacity-60 group-hover:opacity-100 transition-opacity">
+                            <span className="opacity-60 group-hover:opacity-100 transition-opacity duration-250 cursor-pointer">
                               [a partir de {msg.contextProject.title} —{" "}
                               {msg.contextProject.author}]
                             </span>
@@ -184,9 +188,8 @@ const Explore: React.FC = () => {
                         </span>
                       )}
                     </p>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h2 className="text-body-1">{msg.prompt}</h2>
-                    </div>
+                    <h2 className="text-body-1 mt-0.5">{msg.prompt}</h2>
+                    <span className="block h-px w-full bg-color-1 opacity-50 mt-2" />
                   </div>
                 </div>
 

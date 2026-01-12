@@ -8,7 +8,7 @@ const Menu = () => {
       <div className="container flex items-center justify-between h-full menu-footer-setup">
         <div className="flex flex-row gap-4 items-center">
           <Link to="/" className="flex items-center gap-4">
-            <h1 className="text-title-1 text-color-1 hover:opacity-50 transition-opacity">
+            <h1 className="text-title-1 text-color-1 hover:opacity-50 transition-opacity duration-250">
               LASTRO
             </h1>
           </Link>
@@ -22,7 +22,7 @@ const Menu = () => {
         <nav className="flex flex-row items-end gap-2 text-body-2 uppercase">
           <Link
             to="/explorar"
-            className={`p-2 transition-opacity ${
+            className={`p-2 transition-colors duration-250 ${
               location.pathname === "/explorar"
                 ? "text-color-1"
                 : "text-color-1/50 hover:text-color-1"
@@ -33,7 +33,7 @@ const Menu = () => {
 
           <Link
             to="/sobre"
-            className={`p-2 pr-0 transition-opacity ${
+            className={`p-2 pr-0 transition-colors duration-250 ${
               location.pathname === "/sobre"
                 ? "text-color-1"
                 : "text-color-1/50 hover:text-color-1"

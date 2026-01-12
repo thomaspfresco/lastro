@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams} from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { getRandomProjects } from "../requests/requests";
 import { useContentReady } from "../composables/usePageTransition";
 
@@ -12,18 +12,23 @@ const Home = () => {
   const [project, setProject] = useState<Project>();
   const [randomProjects, setRandomProjects] = useState<Projects | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingHero, setIsLoadingHero] = useState(true);
 
-  useContentReady(true);
+  useContentReady(!!project && !isLoadingHero && !isLoading);
 
   useEffect(() => {
-    getRandomProjects(1).then((res) => setProject((res as Project[])[0]));
+    setIsLoadingHero(true);
+    getRandomProjects(1).then((res) => {
+      setProject((res as Project[])[0]);
+      setIsLoadingHero(false);
+    });
   }, []);
 
   useEffect(() => {
     const loadRandomProjects = async () => {
       setIsLoading(true);
       try {
-        const projects = await getRandomProjects(100);
+        const projects = await getRandomProjects(96);
         setRandomProjects(projects as Projects);
       } catch (error) {
         console.error("Error fetching random projects:", error);
@@ -37,21 +42,26 @@ const Home = () => {
 
   if (!project) return <div />;
 
-  return <div className="grid-setup !pt-[var(--menu-height)]">
-    <ProjectHome currentProjectId={id} />
+  return (
+    <div className="grid-setup !pt-[var(--menu-height)]">
+      <ProjectHome currentProjectId={id} />
 
-    <div className="relative mt-8 scroll-smooth scroll-mt-[var(--menu-height)]" id="projects">
+      <div
+        className="relative mt-8 scroll-smooth scroll-mt-[var(--menu-height)]"
+        id="projects"
+      >
         {isLoading && <LoadingState messages={[["Carregando..."]]} />}
 
         {randomProjects && (
           <ProjectBlockHome
-            title="Explorar Arquivo"
+            title="Explore o arquivo"
             projects={randomProjects}
             topOffset={0}
           />
         )}
       </div>
-  </div>;
+    </div>
+  );
 };
 
 export default Home;

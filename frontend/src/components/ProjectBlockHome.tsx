@@ -1,6 +1,8 @@
 import ProjectCard from "./ProjectCard";
 import { useState, useRef, useLayoutEffect } from "react";
+import { getRandomProjects } from "../requests/requests";
 import gsap from "gsap";
+import LoadingState from "./LoadingState";
 
 interface ProjectBlockProps {
   title: string;
@@ -8,43 +10,56 @@ interface ProjectBlockProps {
   topOffset?: number;
 }
 
-const CARDS_PER_CHUNK = 9;
-
 const ProjectBlockHome: React.FC<ProjectBlockProps> = ({
   title,
-  projects,
+  projects: initialProjects,
   topOffset = 0,
 }) => {
   const [isCollapsed] = useState(false);
-  const [visibleCount] = useState(CARDS_PER_CHUNK);
+  const [projects, setProjects] = useState<Projects>(initialProjects);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [previousCount, setPreviousCount] = useState(initialProjects.length);
+  const projectRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const blockRef = useRef<HTMLDivElement>(null);
-  const previousVisibleCount = useRef(CARDS_PER_CHUNK);
+  const handleLoadMore = async () => {
+    setIsLoadingMore(true);
+    try {
+      const moreProjects = (await getRandomProjects(99)) as Projects;
+      setPreviousCount(projects.length);
+      setProjects((prev) => [...prev, ...moreProjects]);
+    } catch (error) {
+      console.error("Error loading more projects:", error);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   useLayoutEffect(() => {
-    if (!blockRef.current) return;
+    // Only animate new projects
+    if (projects.length > previousCount) {
+      const newProjectElements = [];
+      for (let i = previousCount; i < projects.length; i++) {
+        const el = projectRefs.current[`${projects[i].id}-${i}`];
+        if (el) newProjectElements.push(el);
+      }
 
-    const cards = blockRef.current.querySelectorAll<HTMLElement>(
-      "[data-card-index]"
-    );
-
-    const ctx = gsap.context(() => {
-      gsap.set(cards, { opacity: 0, xPercent: 10 });
-      gsap.to(cards, {
-        opacity: 1,
-        xPercent: 0,
-        duration: 1,
-        stagger: 0.08,
-        ease: "expo.out",
-      });
-    }, blockRef);
-
-    previousVisibleCount.current = visibleCount;
-    return () => ctx.revert();
-  }, []);
+      if (newProjectElements.length > 0) {
+        gsap.fromTo(
+          newProjectElements,
+          { opacity: 0, xPercent: 20 },
+          {
+            opacity: 1,
+            xPercent: 0,
+            duration: 1.2,
+            ease: "expo.out",
+          }
+        );
+      }
+    }
+  }, [projects.length, previousCount, projects]);
 
   return (
-    <div ref={blockRef} className="project-block relative z-0">
+    <div className="project-block relative z-0">
       <div
         className="sticky bg-color-bg z-20 py-3"
         style={{ top: `calc(var(--menu-height) + ${topOffset}px)` }}
@@ -62,27 +77,41 @@ const ProjectBlockHome: React.FC<ProjectBlockProps> = ({
           ${
             isCollapsed
               ? "grid-rows-[0fr] opacity-0 mb-0"
-              : "grid-rows-[1fr] opacity-100 mb-24"
+              : "grid-rows-[1fr] opacity-100 mb-8"
           }
         `}
       >
         <div className="overflow-hidden">
-        <div className="flex flex-wrap gap-y-6 md:gap-y-8 -mx-0 md:-mx-3 lg:-mx-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-6 md:gap-y-8 gap-x-0 md:gap-x-6 lg:gap-x-8">
             {projects.map((project, index) => (
-            <div
-              key={project.id}
-              data-card-index={index}
-              className="
-                w-full
-                md:w-1/2
-                lg:w-1/3
-                px-0 md:px-3 lg:px-4
-              "
-            >
-              <ProjectCard project={project} />
-            </div>
-          ))}
-        </div>
+              <div
+                key={`${project.id}-${index}`}
+                ref={(el) => {
+                  projectRefs.current[`${project.id}-${index}`] = el;
+                }}
+              >
+                <ProjectCard project={project} />
+              </div>
+            ))}
+          </div>
+          <div
+            className={`flex ${
+              isLoadingMore
+                ? "justify-start pt-6"
+                : "justify-start md:justify-center"
+            }`}
+          >
+            {isLoadingMore ? (
+              <LoadingState messages={[["A", "carregar", "mais..."]]} />
+            ) : (
+              <button
+                onClick={handleLoadMore}
+                className="text-note-2 cursor-pointer text-color-2 hover:text-color-1 transition-all duration-250 underline pt-4 pb-4 mt-7"
+              >
+                Ver mais projetos
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
